@@ -14,7 +14,7 @@ int redPin = 11;  //Pins RGB LED
 int greenPin = 12;
 int bluePin = 13;
 
-int pwrButton1 =51 ; //boton explusion manual
+int pwrButton1 =51 ; //boton explusion manual // dont work
 int button1 =53;
 
 int sensorPin = A2; // Detector Sensor 
@@ -23,7 +23,7 @@ int PWMA = 7; //Speed motor
 int dirMotorA1 = 6; // Drive motor Connector 1
 int dirMotorA2= 8; // Drive motor Connector 2
 int velocidad = 230; //Speed (170-254)
-int tiempoExpulsion = 2000;  //para que no caiga billete. Depende de velocidad de motores
+int tiempoExpulsion = 2100;  //para que no caiga billete. Depende de velocidad de motores
 
 unsigned long tiempo; // Vars to delays
 unsigned long t_act;
@@ -57,7 +57,7 @@ Serial.println("NFC Peer to Peer Example - Receive Message");
 
 
 void loop(){
-  if ( digitalRead(button1)== HIGH) {  //boton Expulsion  --> Emergency button if nfc dont work ;) 
+  if ( digitalRead(button1)== HIGH) {  //boton Expulsion  --> Emergency button if nfc dont work . still dont work :(( 
        take();  //Give me  Money!!
        paro();
       }
@@ -134,7 +134,6 @@ void take(){  //TAKE A MONEY
  paro();
  if (haveMoney){setColor(0,254,0);} //led green;
   else {setColor (254,0,0);}
-  setColor (254,0,0);
  delay(3000);
  setColor(0,0,0); //led OFF;
 }

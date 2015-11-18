@@ -21,7 +21,7 @@ int PWMA = 7; //Speed motor
 int dirMotorA1 = 6; // Drive motor Connector 1
 int dirMotorA2= 8; // Drive motor Connector 2
 int velocidad = 230; //Speed (170-254)
-int tiempoExpulsion = 2000;  //para que no caiga billete. Depende de velocidad de motores
+int tiempoExpulsion = 2100;  //para que no caiga billete. Depende de velocidad de motores
 
 unsigned long tiempo; // Vars to delays
 unsigned long t_act;
@@ -45,6 +45,31 @@ pinMode(7, OUTPUT);
 pinMode(8, OUTPUT);
 paro();
 
+ Serial.begin(115200);
+  Serial.println("Hello!");
+
+  nfc.begin();
+
+  uint32_t versiondata = nfc.getFirmwareVersion();
+  if (! versiondata) {
+    Serial.print("Didn't find PN53x board");
+    while (1); // halt
+  }
+  
+  // Got ok data, print it out!
+  Serial.print("Found chip PN5"); Serial.println((versiondata>>24) & 0xFF, HEX); 
+  Serial.print("Firmware ver. "); Serial.print((versiondata>>16) & 0xFF, DEC); 
+  Serial.print('.'); Serial.println((versiondata>>8) & 0xFF, DEC);
+  
+  // Set the max number of retry attempts to read from a card
+  // This prevents us from waiting forever for a card, which is
+  // the default behaviour of the PN532.
+  nfc.setPassiveActivationRetries(0xFF);
+  
+  // configure board to read RFID tags
+  nfc.SAMConfig();
+    
+  Serial.println("Waiting for an ISO14443A card");
 
  
 
@@ -57,6 +82,7 @@ void loop(){
   if ( digitalRead(button1)== HIGH) {  //boton Expulsion  --> Emergency button if nfc dont work ;) 
        take();  //Give me  Money!!
        paro();
+       Serial.println("boton");
       }
   
   boolean success;
@@ -89,20 +115,7 @@ void loop(){
   }
   
       
-  Serial.println("Waiting for message from Peer");
-    int msgSize = nfc.read(ndefBuf, sizeof(ndefBuf));
-    if (msgSize > 0) {
-        NdefMessage msg  = NdefMessage(ndefBuf, msgSize);
-        msg.print();
-        take();  //Give me  Money!!
-        paro();
-        Serial.println("\nSuccess");
-    } else {
-        Serial.println("Failed");
-        take();  //Give me  Money!!
-        paro();  
-  }
-    delay(3000);
+
  
  
 }
@@ -158,7 +171,6 @@ void take(){  //TAKE A MONEY
  paro();
  if (haveMoney){setColor(0,254,0);} //led green;
   else {setColor (254,0,0);}
-  setColor (254,0,0);
  delay(3000);
  setColor(0,0,0); //led OFF;
 }
